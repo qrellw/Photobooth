@@ -33,12 +33,14 @@ export const Controls: React.FC<ControlsProps> = ({
                         <SelectValue placeholder="Filter" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="none">Normal</SelectItem>
-                        <SelectItem value="grayscale(100%)">B&W</SelectItem>
-                        <SelectItem value="sepia(80%)">Sepia</SelectItem>
-                        <SelectItem value="contrast(150%) saturate(0)">Noir</SelectItem>
-                        <SelectItem value="saturate(200%) contrast(80%)">Vivid</SelectItem>
-                        <SelectItem value="hue-rotate(90deg)">Alien</SelectItem>
+                        <SelectItem value="none">Mặc định</SelectItem>
+                        <SelectItem value="brightness(1.2) contrast(1.05) saturate(0.9)">Trắng sáng (Hàn Quốc)</SelectItem>
+                        <SelectItem value="brightness(1.1) contrast(1.1) saturate(1.3)">Tươi tắn</SelectItem>
+                        <SelectItem value="brightness(1.1) blur(0.5px) contrast(0.95)">Mịn màng (Soft)</SelectItem>
+                        <SelectItem value="sepia(0.4) contrast(1.1) brightness(0.9) saturate(0.8)">Vintage</SelectItem>
+                        <SelectItem value="contrast(1.15) saturate(0.9) sepia(0.15) brightness(1.05)">Màu Film</SelectItem>
+                        <SelectItem value="grayscale(100%)">Trắng đen</SelectItem>
+                        <SelectItem value="sepia(80%)">Cổ điển</SelectItem>
                     </SelectContent>
                 </Select>
             </div>

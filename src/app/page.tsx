@@ -11,6 +11,7 @@ import { ModeToggle } from '@/components/ui/ThemeToggle';
 export default function Home() {
   const { videoRef, startCamera } = useCamera();
   const [filter, setFilter] = useState('none');
+  const [layout, setLayout] = useState<'horizontal' | 'vertical'>('horizontal');
   const [isFlashing, setIsFlashing] = useState(false);
 
   // State Machine: 'idle' | 'countdown' | 'capturing' | 'processing' | 'review'
@@ -28,19 +29,54 @@ export default function Home() {
 
   const captureImage = () => {
     if (videoRef.current) {
+      const video = videoRef.current;
       const canvas = document.createElement("canvas");
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        // Processing for capture (Mirror + Filter)
-        ctx.translate(canvas.width, 0);
-        ctx.scale(-1, 1);
-        if (filter !== 'none') {
-          ctx.filter = filter;
+
+      if (layout === 'vertical') {
+        // Vertical Capture (9:16) - Crop from center
+        // Assuming video is usually 16:9 (landscape) e.g. 640x480 or 1920x1080
+        const videoAspect = video.videoWidth / video.videoHeight;
+        const targetAspect = 9 / 16;
+
+        let drawW, drawH, startX, startY;
+
+        // Our video is likely wider than target (1.77 > 0.56)
+        // So we fit height, crop width
+        const contentHeight = video.videoHeight;
+        const contentWidth = contentHeight * targetAspect; // Height * 9/16
+
+        drawW = contentWidth;
+        drawH = contentHeight;
+        startX = (video.videoWidth - contentWidth) / 2;
+        startY = 0;
+
+        canvas.width = contentWidth;
+        canvas.height = contentHeight;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.translate(canvas.width, 0);
+          ctx.scale(-1, 1);
+          if (filter !== 'none') {
+            ctx.filter = filter;
+          }
+          // Draw the cropped portion
+          ctx.drawImage(video, startX, startY, drawW, drawH, 0, 0, canvas.width, canvas.height);
+          return canvas.toDataURL("image/jpeg", 0.95);
         }
-        ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-        return canvas.toDataURL("image/jpeg", 0.95);
+      } else {
+        // Horizontal Capture (Standard)
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.translate(canvas.width, 0);
+          ctx.scale(-1, 1);
+          if (filter !== 'none') {
+            ctx.filter = filter;
+          }
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          return canvas.toDataURL("image/jpeg", 0.95);
+        }
       }
     }
     return null;
@@ -95,7 +131,7 @@ export default function Home() {
   const finishSession = async (photos: string[]) => {
     setStatus('processing');
     try {
-      const url = await generateCollage(photos);
+      const url = await generateCollage(photos, layout);
       setCollageUrl(url);
       setStatus('review');
     } catch (e) {
@@ -143,7 +179,12 @@ export default function Home() {
       </div>
 
       {/* Camera Container */}
-      <div className="relative w-full max-w-5xl aspect-[16/9] rounded-3xl overflow-hidden shadow-2xl border border-white/5">
+      <div
+        className={`relative overflow-hidden shadow-2xl border border-white/5 bg-black transition-all duration-300 ${layout === 'horizontal'
+            ? 'w-full max-w-5xl aspect-[16/9] rounded-3xl'
+            : 'h-[80vh] aspect-[9/16] rounded-2xl'
+          }`}
+      >
         <Camera videoRef={videoRef} filter={filter} isFlashing={isFlashing} />
 
         {/* Messages / Countdown */}
@@ -190,6 +231,8 @@ export default function Home() {
         onFilterChange={setFilter}
         currentFilter={filter}
         isCapturing={status !== 'idle'}
+        layout={layout}
+        onLayoutChange={setLayout}
       />
 
       {/* Preview Modal */}
@@ -200,6 +243,7 @@ export default function Home() {
         onDownload={handleDownload}
         onCopy={handleCopy}
       />
+
     </main>
   );
 }

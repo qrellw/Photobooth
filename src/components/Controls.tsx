@@ -16,31 +16,75 @@ interface ControlsProps {
     onFilterChange: (filter: string) => void;
     currentFilter: string;
     isCapturing: boolean;
+    layout: 'horizontal' | 'vertical';
+    onLayoutChange: (layout: 'horizontal' | 'vertical') => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
     onCapture,
     onFilterChange,
     currentFilter,
-    isCapturing
+    isCapturing,
+    layout,
+    onLayoutChange
 }) => {
     return (
-        <div className="flex items-center justify-between w-full max-w-3xl mx-auto p-6 bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10">
+        <div className="flex items-center justify-between w-full max-w-3xl mx-auto p-6 bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 gap-4">
             {/* Filter Selector */}
-            <div className="w-40">
+            <div className="flex gap-4">
+                <Select value={layout} onValueChange={(v) => onLayoutChange(v as 'horizontal' | 'vertical')} disabled={isCapturing}>
+                    <SelectTrigger className="w-32 bg-white/10 border-white/20 text-white">
+                        <SelectValue placeholder="Layout" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="horizontal">Khổ Ngang</SelectItem>
+                        <SelectItem value="vertical">Khổ Dọc</SelectItem>
+                    </SelectContent>
+                </Select>
+
                 <Select value={currentFilter} onValueChange={onFilterChange} disabled={isCapturing}>
-                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                    <SelectTrigger className="w-40 bg-white/10 border-white/20 text-white">
                         <SelectValue placeholder="Filter" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="none">Mặc định</SelectItem>
-                        <SelectItem value="brightness(1.2) contrast(1.05) saturate(0.9)">Trắng sáng (Hàn Quốc)</SelectItem>
-                        <SelectItem value="brightness(1.1) contrast(1.1) saturate(1.3)">Tươi tắn</SelectItem>
-                        <SelectItem value="brightness(1.1) blur(0.5px) contrast(0.95)">Mịn màng (Soft)</SelectItem>
-                        <SelectItem value="sepia(0.4) contrast(1.1) brightness(0.9) saturate(0.8)">Vintage</SelectItem>
-                        <SelectItem value="contrast(1.15) saturate(0.9) sepia(0.15) brightness(1.05)">Màu Film</SelectItem>
-                        <SelectItem value="grayscale(100%)">Trắng đen</SelectItem>
-                        <SelectItem value="sepia(80%)">Cổ điển</SelectItem>
+                        <SelectItem value="none">
+                            Mặc định
+                        </SelectItem>
+
+                        {/* 🇰🇷 Trắng sáng Hàn Quốc – sáng vừa, da không bệt */}
+                        <SelectItem value="brightness(1.08) contrast(1.04) saturate(0.95)">
+                            Trắng sáng (Hàn Quốc)
+                        </SelectItem>
+
+                        {/* 🌈 Tươi tắn – tăng màu nhẹ, không đỏ da */}
+                        <SelectItem value="brightness(1.07) contrast(1.05) saturate(1.15)">
+                            Tươi tắn
+                        </SelectItem>
+
+                        {/* ✨ Mịn màng – blur rất nhẹ, không fake */}
+                        <SelectItem value="brightness(1.05) contrast(0.98) saturate(0.95) blur(0.4px)">
+                            Mịn màng (Soft)
+                        </SelectItem>
+
+                        {/* 🎞 Vintage sạch – không ám bẩn */}
+                        <SelectItem value="sepia(0.25) contrast(1.05) brightness(0.98) saturate(0.85)">
+                            Vintage
+                        </SelectItem>
+
+                        {/* 🎥 Film – màu dịu, kiểu phòng chụp */}
+                        <SelectItem value="contrast(1.06) saturate(0.9) sepia(0.15) brightness(1.03)">
+                            Màu Film
+                        </SelectItem>
+
+                        {/* ⚫ Trắng đen – rõ mặt, không gắt */}
+                        <SelectItem value="grayscale(100%) contrast(1.05) brightness(1.05)">
+                            Trắng đen
+                        </SelectItem>
+
+                        {/* 🟤 Cổ điển – sepia vừa phải */}
+                        <SelectItem value="sepia(0.6) contrast(1.03) brightness(1.02)">
+                            Cổ điển
+                        </SelectItem>
                     </SelectContent>
                 </Select>
             </div>

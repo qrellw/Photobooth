@@ -1,9 +1,52 @@
-export async function generateCollage(photoDataUrls: string[]): Promise<string> {
+// Hardcoded coordinates for now.
+// TODO: Externalize or make dynamic if needed.
+
+type LayoutType = 'horizontal' | 'vertical';
+
+interface TemplateConfig {
+    templateSrc: string;
+    width: number;
+    height: number;
+    photos: { x: number; y: number; w: number; h: number }[];
+}
+
+// NOTE: Vertical coordinates are placeholders!
+const LAYOUTS: Record<LayoutType, TemplateConfig> = {
+    horizontal: {
+        templateSrc: '/template_h.png',
+        width: 1920, // Verify actual size if possible, otherwise rely on loaded image
+        height: 1080,
+        photos: [
+            { x: 142, y: 531, w: 527, h: 349 },  // Left
+            { x: 696, y: 531, w: 527, h: 349 },  // Center
+            { x: 1250, y: 531, w: 527, h: 349 }  // Right
+        ]
+    },
+    vertical: {
+        templateSrc: '/template_v.png',
+        width: 1080,
+        height: 1920,
+        photos: [
+            // Vertical Layout Coordinates from Figma
+            // X stays 531 for all (Right aligned strip)
+            // W=349, H=529
+            // Y positions derived from top margin 140, gap 26
+            { x: 531, y: 140, w: 349, h: 529 },  // Top
+            { x: 531, y: 695, w: 349, h: 529 },  // Middle (140 + 529 + 26)
+            { x: 531, y: 1251, w: 349, h: 529 }  // Bottom (Explicitly 1251 from image)
+        ]
+    }
+};
+
+export async function generateCollage(photoDataUrls: string[], layout: LayoutType = 'horizontal'): Promise<string> {
     return new Promise((resolve, reject) => {
-        console.log("Generating collage...");
+        console.log(`Generating ${layout} collage...`);
+
+        const config = LAYOUTS[layout];
         const template = new Image();
-        template.src = "/template.png";
+        template.src = config.templateSrc;
         template.crossOrigin = "anonymous";
+
 
         template.onerror = (e) => {
             console.error("Failed to load template image. Check public/template.png", e);
@@ -23,16 +66,7 @@ export async function generateCollage(photoDataUrls: string[]): Promise<string> 
             }
 
             // 1. Draw Photos FIRST (Background)
-            // Precise coordinates from Figma:
-            // Box 3: X=1250, Y=531, W=527, H=349
-            // Gap: 27px
-            // Calculated Box 2: X=696
-            // Calculated Box 1: X=142
-            const photoConfig = [
-                { x: 142, y: 531, w: 527, h: 349 },  // Left
-                { x: 696, y: 531, w: 527, h: 349 },  // Center
-                { x: 1250, y: 531, w: 527, h: 349 }  // Right
-            ];
+            const photoConfig = config.photos;
 
             // Load all photos
             const loadedPhotos = await Promise.all(photoDataUrls.map(url => {

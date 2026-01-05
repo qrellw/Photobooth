@@ -13,7 +13,8 @@ export default function Home() {
   const { loaded: cvLoaded } = useOpenCV();
   const { videoRef, startCamera } = useCamera();
   const [filter, setFilter] = useState('none');
-  const [layout, setLayout] = useState<'horizontal' | 'vertical'>('horizontal');
+  const [layout, setLayout] = useState<'horizontal' | 'vertical' | 'strip_4'>('horizontal');
+  const [photoCount, setPhotoCount] = useState<3 | 4>(3);
 
   useEffect(() => {
     if (cvLoaded) {
@@ -72,7 +73,7 @@ export default function Home() {
           return canvas.toDataURL("image/jpeg", 0.95);
         }
       } else {
-        // Horizontal Capture (Standard)
+        // Horizontal Capture (Standard) & Strip 1x4 (Photos are landscape)
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         const ctx = canvas.getContext("2d");
@@ -122,7 +123,7 @@ export default function Home() {
       const newPhotos = [...rawPhotos, photo];
       setRawPhotos(newPhotos);
 
-      if (newPhotos.length < 3) {
+      if (newPhotos.length < photoCount) {
         // Next shot
         setCurrentShot(prev => prev + 1);
         // Short delay before next countdown
@@ -178,6 +179,15 @@ export default function Home() {
     }
   };
 
+  const handlePhotoCountChange = (count: 3 | 4) => {
+    setPhotoCount(count);
+    if (count === 4) {
+      setLayout('strip_4');
+    } else {
+      setLayout('horizontal');
+    }
+  };
+
   return (
     <main className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-4 gap-8 relative">
 
@@ -188,7 +198,7 @@ export default function Home() {
 
       {/* Camera Container */}
       <div
-        className={`relative overflow-hidden shadow-2xl border border-white/5 bg-black transition-all duration-300 ${layout === 'horizontal'
+        className={`relative overflow-hidden shadow-2xl border border-white/5 bg-black transition-all duration-300 ${layout === 'horizontal' || layout === 'strip_4'
           ? 'w-full max-w-5xl aspect-[16/9] rounded-3xl'
           : 'h-[80vh] aspect-[9/16] rounded-2xl'
           }`}
@@ -227,7 +237,7 @@ export default function Home() {
           {/* Shot Indicator (1/3) */}
           {status === 'countdown' && countdown !== null && (
             <div className="absolute top-8 right-8 bg-black/50 px-4 py-2 rounded-full text-white font-bold text-xl z-30 border border-white/20">
-              Shot {currentShot}/3
+              Shot {currentShot}/{photoCount}
             </div>
           )}
         </AnimatePresence>
@@ -241,6 +251,8 @@ export default function Home() {
         isCapturing={status !== 'idle'}
         layout={layout}
         onLayoutChange={setLayout}
+        photoCount={photoCount}
+        onPhotoCountChange={handlePhotoCountChange}
       />
 
       {/* Preview Modal */}

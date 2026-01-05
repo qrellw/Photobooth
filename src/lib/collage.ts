@@ -1,7 +1,7 @@
 // Hardcoded coordinates for now.
 // TODO: Externalize or make dynamic if needed.
 
-type LayoutType = 'horizontal' | 'vertical';
+type LayoutType = 'horizontal' | 'vertical' | 'strip_4';
 
 interface TemplateConfig {
     templateSrc: string;
@@ -34,6 +34,22 @@ const LAYOUTS: Record<LayoutType, TemplateConfig> = {
             { x: 531, y: 140, w: 349, h: 529 },  // Top
             { x: 531, y: 695, w: 349, h: 529 },  // Middle (140 + 529 + 26)
             { x: 531, y: 1251, w: 349, h: 529 }  // Bottom (Explicitly 1251 from image)
+        ]
+    },
+    strip_4: {
+        templateSrc: '/1x4/1x4_default.png',
+        width: 880,
+        height: 2650,
+        photos: [
+            // Specs from user images:
+            // Canvas: 880 x 2650
+            // Photo: 770 x 565
+            // Margins: Top 64, Sides 55 (880-770)/2 = 55
+            // Gap: 47
+            { x: 55, y: 64, w: 770, h: 565 },
+            { x: 55, y: 64 + 565 + 47, w: 770, h: 565 },         // Y = 676
+            { x: 55, y: 676 + 565 + 47, w: 770, h: 565 },        // Y = 1288
+            { x: 55, y: 1288 + 565 + 47, w: 770, h: 565 }        // Y = 1900
         ]
     }
 };

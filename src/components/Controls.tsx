@@ -16,8 +16,10 @@ interface ControlsProps {
     onFilterChange: (filter: string) => void;
     currentFilter: string;
     isCapturing: boolean;
-    layout: 'horizontal' | 'vertical';
-    onLayoutChange: (layout: 'horizontal' | 'vertical') => void;
+    layout: 'horizontal' | 'vertical' | 'strip_4';
+    onLayoutChange: (layout: 'horizontal' | 'vertical' | 'strip_4') => void;
+    photoCount: 3 | 4;
+    onPhotoCountChange: (count: 3 | 4) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -26,19 +28,47 @@ export const Controls: React.FC<ControlsProps> = ({
     currentFilter,
     isCapturing,
     layout,
-    onLayoutChange
+    onLayoutChange,
+    photoCount,
+    onPhotoCountChange
 }) => {
     return (
         <div className="flex items-center justify-between w-full max-w-3xl mx-auto p-6 bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 gap-4">
             {/* Filter Selector */}
             <div className="flex gap-4">
-                <Select value={layout} onValueChange={(v) => onLayoutChange(v as 'horizontal' | 'vertical')} disabled={isCapturing}>
+                {/* Photo Count Selector */}
+                <Select
+                    value={photoCount.toString()}
+                    onValueChange={(v) => onPhotoCountChange(parseInt(v) as 3 | 4)}
+                    disabled={isCapturing}
+                >
+                    <SelectTrigger className="w-24 bg-white/10 border-white/20 text-white">
+                        <SelectValue placeholder="Shots" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="3">3 Ảnh</SelectItem>
+                        <SelectItem value="4">4 Ảnh</SelectItem>
+                    </SelectContent>
+                </Select>
+
+                {/* Layout Selector - Disabled if 4 photos (Fixed to 1x4 Strip) */}
+                <Select
+                    value={layout}
+                    onValueChange={(v) => onLayoutChange(v as 'horizontal' | 'vertical' | 'strip_4')}
+                    disabled={isCapturing || photoCount === 4}
+                >
                     <SelectTrigger className="w-32 bg-white/10 border-white/20 text-white">
                         <SelectValue placeholder="Layout" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="horizontal">Khổ Ngang</SelectItem>
-                        <SelectItem value="vertical">Khổ Dọc</SelectItem>
+                        {photoCount === 4 ? (
+                            <SelectItem value="strip_4">Dải 1x4</SelectItem>
+                        ) : (
+                            <>
+                                <SelectItem value="horizontal">Khổ Ngang</SelectItem>
+                                <SelectItem value="vertical">Khổ Dọc</SelectItem>
+                            </>
+                        )}
                     </SelectContent>
                 </Select>
 

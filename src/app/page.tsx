@@ -7,11 +7,19 @@ import { PreviewModal } from '@/components/PreviewModal';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCamera } from '@/hooks/useCamera';
 import { generateCollage } from '@/lib/collage';
+import { useOpenCV } from '@/hooks/useOpenCV';
 import { ModeToggle } from '@/components/ui/ThemeToggle';
 export default function Home() {
+  const { loaded: cvLoaded } = useOpenCV();
   const { videoRef, startCamera } = useCamera();
   const [filter, setFilter] = useState('none');
   const [layout, setLayout] = useState<'horizontal' | 'vertical'>('horizontal');
+
+  useEffect(() => {
+    if (cvLoaded) {
+      console.log("OpenCV is ready to use!");
+    }
+  }, [cvLoaded]);
   const [isFlashing, setIsFlashing] = useState(false);
 
   // State Machine: 'idle' | 'countdown' | 'capturing' | 'processing' | 'review'
@@ -181,8 +189,8 @@ export default function Home() {
       {/* Camera Container */}
       <div
         className={`relative overflow-hidden shadow-2xl border border-white/5 bg-black transition-all duration-300 ${layout === 'horizontal'
-            ? 'w-full max-w-5xl aspect-[16/9] rounded-3xl'
-            : 'h-[80vh] aspect-[9/16] rounded-2xl'
+          ? 'w-full max-w-5xl aspect-[16/9] rounded-3xl'
+          : 'h-[80vh] aspect-[9/16] rounded-2xl'
           }`}
       >
         <Camera videoRef={videoRef} filter={filter} isFlashing={isFlashing} />

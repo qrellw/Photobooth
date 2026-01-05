@@ -32,7 +32,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="sm:max-w-md bg-neutral-900 border-neutral-800 text-white">
+            <DialogContent className="sm:max-w-3xl bg-neutral-900 border-neutral-800 text-white">
                 <DialogHeader>
                     <DialogTitle className="text-center text-2xl font-bold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
                         Your Photos
@@ -45,7 +45,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
                         <img
                             src={imageUrl}
                             alt="Collage Preview"
-                            className="max-h-[60vh] w-auto rounded-lg shadow-2xl object-contain"
+                            className="max-h-[80vh] w-auto rounded-lg shadow-2xl object-contain"
                         />
                     )}
                 </div>

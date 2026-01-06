@@ -13,7 +13,7 @@ interface TemplateConfig {
 // NOTE: Vertical coordinates are placeholders!
 const LAYOUTS: Record<LayoutType, TemplateConfig> = {
     horizontal: {
-        templateSrc: '/template_h.png',
+        templateSrc: '/1x3/template_h.png',
         width: 1920, // Verify actual size if possible, otherwise rely on loaded image
         height: 1080,
         photos: [
@@ -23,7 +23,7 @@ const LAYOUTS: Record<LayoutType, TemplateConfig> = {
         ]
     },
     vertical: {
-        templateSrc: '/template_v.png',
+        templateSrc: '/1x3/template_v.png',
         width: 1080,
         height: 1920,
         photos: [

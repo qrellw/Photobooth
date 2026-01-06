@@ -145,6 +145,7 @@ export default function Home() {
       setStatus('review');
     } catch (e) {
       console.error(e);
+      alert("Lỗi khi tạo ảnh: " + e);
       setStatus('idle');
     }
   };

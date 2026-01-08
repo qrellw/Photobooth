@@ -6,7 +6,7 @@ import { Controls } from '@/components/Controls';
 import { PreviewModal } from '@/components/PreviewModal';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCamera } from '@/hooks/useCamera';
-import { generateCollage } from '@/lib/collage';
+import { generateCollage, AVAILABLE_TEMPLATES_1X4 } from '@/lib/collage';
 import { useOpenCV } from '@/hooks/useOpenCV';
 import { ModeToggle } from '@/components/ui/ThemeToggle';
 export default function Home() {
@@ -15,6 +15,7 @@ export default function Home() {
   const [filter, setFilter] = useState('none');
   const [layout, setLayout] = useState<'horizontal' | 'vertical' | 'strip_4'>('horizontal');
   const [photoCount, setPhotoCount] = useState<3 | 4>(3);
+  const [selectedTemplate, setSelectedTemplate] = useState(AVAILABLE_TEMPLATES_1X4[0].src);
 
   useEffect(() => {
     if (cvLoaded) {
@@ -140,7 +141,7 @@ export default function Home() {
   const finishSession = async (photos: string[]) => {
     setStatus('processing');
     try {
-      const url = await generateCollage(photos, layout);
+      const url = await generateCollage(photos, layout, layout === 'strip_4' ? selectedTemplate : undefined);
       setCollageUrl(url);
       setStatus('review');
     } catch (e) {
@@ -199,9 +200,9 @@ export default function Home() {
 
       {/* Camera Container */}
       <div
-        className={`relative overflow-hidden shadow-2xl border border-white/5 bg-black transition-all duration-300 ${layout === 'horizontal' || layout === 'strip_4'
-          ? 'w-full max-w-5xl aspect-[16/9] rounded-3xl'
-          : 'h-[80vh] aspect-[9/16] rounded-2xl'
+        className={`relative overflow-hidden shadow-2xl border border-white/5 bg-black transition-all duration-300 mx-auto ${layout === 'horizontal' || layout === 'strip_4'
+          ? 'w-full max-w-5xl aspect-video md:aspect-[16/9] rounded-xl md:rounded-3xl'
+          : 'h-[60vh] md:h-[80vh] aspect-[9/16] rounded-xl md:rounded-2xl'
           }`}
       >
         <Camera videoRef={videoRef} filter={filter} isFlashing={isFlashing} />
@@ -254,6 +255,8 @@ export default function Home() {
         onLayoutChange={setLayout}
         photoCount={photoCount}
         onPhotoCountChange={handlePhotoCountChange}
+        selectedTemplate={selectedTemplate}
+        onTemplateChange={setSelectedTemplate}
       />
 
       {/* Preview Modal */}

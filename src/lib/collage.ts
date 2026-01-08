@@ -54,13 +54,19 @@ const LAYOUTS: Record<LayoutType, TemplateConfig> = {
     }
 };
 
-export async function generateCollage(photoDataUrls: string[], layout: LayoutType = 'horizontal'): Promise<string> {
+export const AVAILABLE_TEMPLATES_1X4 = [
+    { id: 'default', src: '/1x4/1x4_default.png', alt: 'Default' },
+    { id: 'style1', src: '/1x4/1.png', alt: 'Style 1' },
+    { id: 'style2', src: '/1x4/2.png', alt: 'Style 2' },
+];
+
+export async function generateCollage(photoDataUrls: string[], layout: LayoutType = 'horizontal', templateUrl?: string): Promise<string> {
     return new Promise((resolve, reject) => {
         console.log(`Generating ${layout} collage...`);
 
         const config = LAYOUTS[layout];
         const template = new Image();
-        template.src = config.templateSrc;
+        template.src = templateUrl || config.templateSrc;
         template.crossOrigin = "anonymous";
 
 

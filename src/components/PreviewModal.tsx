@@ -32,7 +32,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="max-w-[95vw] md:max-w-3xl p-0 gap-0 bg-[var(--retro-bg)] border-4 border-[var(--retro-border)] shadow-2xl rounded-xl overflow-hidden">
+            <DialogContent className="max-w-[95vw] md:max-w-3xl p-0 gap-0 bg-[var(--retro-bg)] border-4 border-[var(--retro-border)] shadow-2xl rounded-xl overflow-hidden [&_button[data-slot=dialog-close]]:hidden">
                 {/* Retro Header */}
                 <div className="h-10 bg-[var(--retro-header)] border-b-4 border-[var(--retro-border)] flex items-center justify-between px-3">
                     <span className="font-bold text-[var(--retro-border)] font-mono uppercase tracking-tight">Preview_Image.bmp</span>

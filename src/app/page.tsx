@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Camera } from '@/components/Camera';
 import { Controls } from '@/components/Controls';
 import { PreviewModal } from '@/components/PreviewModal';
+import { RetroWindow } from '@/components/layout/RetroWindow';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCamera } from '@/hooks/useCamera';
 import { generateCollage, AVAILABLE_TEMPLATES_1X4 } from '@/lib/collage';
@@ -191,73 +192,75 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-4 gap-8 relative">
+    <main className="min-h-screen bg-[#E5DCC5] flex items-center justify-center p-4">
+      <RetroWindow
+        title="📷 PhotoBooth.exe"
+        footer={
+          <Controls
+            onCapture={startSession}
+            onFilterChange={setFilter}
+            currentFilter={filter}
+            isCapturing={status !== 'idle'}
+            layout={layout}
+            onLayoutChange={setLayout}
+            photoCount={photoCount}
+            onPhotoCountChange={handlePhotoCountChange}
+            selectedTemplate={selectedTemplate}
+            onTemplateChange={setSelectedTemplate}
+          />
+        }
+      >
+        {/* Camera Container */}
+        <div className="relative w-full h-full flex items-center justify-center rounded-lg overflow-hidden border-2 border-[var(--retro-border)] bg-black shadow-inner">
+          <Camera videoRef={videoRef} filter={filter} isFlashing={isFlashing} />
 
-      {/* Theme Toggle Button */}
-      <div className="absolute top-6 right-6 ">
+          {/* Messages / Countdown */}
+          <AnimatePresence>
+            {/* Countdown Number */}
+            {countdown !== null && (
+              <motion.div
+                key={countdown + "-count"}
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1.5, opacity: 1 }}
+                exit={{ scale: 2, opacity: 0 }}
+                transition={{ duration: 0.5 }}
+                className="absolute inset-0 flex items-center justify-center pointer-events-none z-50"
+              >
+                <span className="text-[8rem] font-bold text-[var(--retro-header)] drop-shadow-[4px_4px_0px_var(--retro-border)] font-mono">
+                  {countdown}
+                </span>
+              </motion.div>
+            )}
+
+            {/* Status Text (Get Ready / Processing) */}
+            {status === 'processing' && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm z-40 flex items-center justify-center"
+              >
+                <span className="text-3xl text-white font-bold animate-pulse font-mono uppercase tracking-widest">
+                  Processing...
+                </span>
+              </motion.div>
+            )}
+
+            {/* Shot Indicator (1/3) */}
+            {status === 'countdown' && countdown !== null && (
+              <div className="absolute top-4 right-4 bg-[var(--retro-header)] px-3 py-1 border-2 border-[var(--retro-border)] rounded shadow-[2px_2px_0px_0px_var(--retro-border)]">
+                <span className="text-[var(--retro-border)] font-bold text-lg font-mono">
+                  {currentShot}/{photoCount}
+                </span>
+              </div>
+            )}
+          </AnimatePresence>
+        </div>
+      </RetroWindow>
+
+      {/* Theme Toggle Button - Positioned absolutely outside the window */}
+      <div className="fixed top-4 right-4 z-50">
         <ModeToggle />
       </div>
-
-      {/* Camera Container */}
-      <div
-        className={`relative overflow-hidden shadow-2xl border border-white/5 bg-black transition-all duration-300 mx-auto ${layout === 'horizontal' || layout === 'strip_4'
-          ? 'w-full max-w-5xl aspect-video md:aspect-[16/9] rounded-xl md:rounded-3xl'
-          : 'h-[60vh] md:h-[80vh] aspect-[9/16] rounded-xl md:rounded-2xl'
-          }`}
-      >
-        <Camera videoRef={videoRef} filter={filter} isFlashing={isFlashing} />
-
-        {/* Messages / Countdown */}
-        <AnimatePresence>
-          {/* Countdown Number */}
-          {countdown !== null && (
-            <motion.div
-              key={countdown + "-count"}
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1.5, opacity: 1 }}
-              exit={{ scale: 2, opacity: 0 }}
-              transition={{ duration: 0.5 }}
-              className="absolute inset-0 flex items-center justify-center pointer-events-none z-50"
-            >
-              <span className="text-[10rem] font-bold text-white drop-shadow-lg font-mono">
-                {countdown}
-              </span>
-            </motion.div>
-          )}
-
-          {/* Status Text (Get Ready / Processing) */}
-          {status === 'processing' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm z-40 flex items-center justify-center"
-            >
-              <span className="text-4xl text-white font-bold animate-pulse">Processing Magic...</span>
-            </motion.div>
-          )}
-
-          {/* Shot Indicator (1/3) */}
-          {status === 'countdown' && countdown !== null && (
-            <div className="absolute top-8 right-8 bg-black/50 px-4 py-2 rounded-full text-white font-bold text-xl z-30 border border-white/20">
-              Shot {currentShot}/{photoCount}
-            </div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Controls */}
-      <Controls
-        onCapture={startSession}
-        onFilterChange={setFilter}
-        currentFilter={filter}
-        isCapturing={status !== 'idle'}
-        layout={layout}
-        onLayoutChange={setLayout}
-        photoCount={photoCount}
-        onPhotoCountChange={handlePhotoCountChange}
-        selectedTemplate={selectedTemplate}
-        onTemplateChange={setSelectedTemplate}
-      />
 
       {/* Preview Modal */}
       <PreviewModal
@@ -267,7 +270,6 @@ export default function Home() {
         onDownload={handleDownload}
         onCopy={handleCopy}
       />
-
     </main>
   );
 }

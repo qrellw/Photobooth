@@ -37,7 +37,7 @@ const LAYOUTS: Record<LayoutType, TemplateConfig> = {
         ]
     },
     strip_4: {
-        templateSrc: '/1x4/1x4_default.png',
+        templateSrc: '/1x4/0.png',
         width: 880,
         height: 2650,
         photos: [
@@ -55,9 +55,12 @@ const LAYOUTS: Record<LayoutType, TemplateConfig> = {
 };
 
 export const AVAILABLE_TEMPLATES_1X4 = [
-    { id: 'default', src: '/1x4/1x4_default.png', alt: 'Default' },
-    { id: 'style1', src: '/1x4/1.png', alt: 'Style 1' },
-    { id: 'style2', src: '/1x4/2.png', alt: 'Style 2' },
+    { id: '0', src: '/1x4/0.png', alt: 'Frame 0' },
+    { id: '1', src: '/1x4/1.png', alt: 'Frame 1' },
+    { id: '2', src: '/1x4/2.png', alt: 'Frame 2' },
+    { id: '3', src: '/1x4/3.png', alt: 'Frame 3' },
+    { id: '4', src: '/1x4/4.png', alt: 'Frame 4' },
+    { id: '5', src: '/1x4/5.png', alt: 'Frame 5' },
 ];
 
 export async function generateCollage(photoDataUrls: string[], layout: LayoutType = 'horizontal', templateUrl?: string): Promise<string> {

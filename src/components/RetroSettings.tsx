@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     Select,
@@ -8,7 +8,9 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { AVAILABLE_TEMPLATES_1X4 } from '@/lib/collage';
-import { X } from 'lucide-react';
+import { X, Plus, ImagePlus } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import { UploadFrameModal } from './UploadFrameModal';
 
 interface RetroSettingsProps {
     filter: string;
@@ -33,6 +35,35 @@ export const RetroSettings: React.FC<RetroSettingsProps> = ({
     onTemplateChange,
     onClose
 }) => {
+    const [remoteFrames, setRemoteFrames] = useState<any[]>([]);
+    const [isUploadOpen, setIsUploadOpen] = useState(false);
+
+    const fetchFrames = useCallback(async () => {
+        const { data } = await supabase
+            .from('frames')
+            .select('*')
+            .order('created_at', { ascending: false });
+        if (data) {
+            setRemoteFrames(data);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (layout === 'strip_4') {
+            fetchFrames();
+        }
+    }, [layout, fetchFrames]);
+
+    // Merge local and remote templates
+    const allTemplates = [
+        ...AVAILABLE_TEMPLATES_1X4,
+        ...remoteFrames.map(f => ({
+            id: `remote-${f.id}`,
+            src: f.url,
+            alt: f.name
+        }))
+    ];
+
     return (
         <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm animate-in fade-in duration-200">
             {/* Shadow layer */}
@@ -117,7 +148,18 @@ export const RetroSettings: React.FC<RetroSettingsProps> = ({
                         <div className="space-y-2">
                             <label className="text-sm font-bold text-[var(--retro-border)] uppercase tracking-wider">Frame Style</label>
                             <div className="grid grid-cols-3 gap-2 py-2">
-                                {AVAILABLE_TEMPLATES_1X4.map((t) => (
+                                {/* Add Frame Button */}
+                                <button
+                                    onClick={() => setIsUploadOpen(true)}
+                                    className="border-2 border-[var(--retro-border)] border-dashed rounded-lg flex flex-col items-center justify-center p-2 opacity-60 hover:opacity-100 hover:bg-black/5 transition-all aspect-[1/3] group"
+                                >
+                                    <div className="w-8 h-8 rounded-full bg-[var(--retro-border)] text-[#F3EAD3] flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+                                        <Plus size={20} strokeWidth={3} />
+                                    </div>
+                                    <span className="text-[10px] font-bold text-[var(--retro-border)] text-center leading-tight">ADD NEW</span>
+                                </button>
+
+                                {allTemplates.map((t) => (
                                     <div
                                         key={t.id}
                                         onClick={() => onTemplateChange(t.src)}
@@ -143,6 +185,18 @@ export const RetroSettings: React.FC<RetroSettingsProps> = ({
                     </Button>
                 </div>
             </div>
+
+            {/* Upload Modal */}
+            {isUploadOpen && (
+                <UploadFrameModal
+                    onClose={() => setIsUploadOpen(false)}
+                    onUploadSuccess={() => {
+                        fetchFrames();
+                        // Optional: Select the newly uploaded frame? 
+                        // For now just refresh list.
+                    }}
+                />
+            )}
         </div>
     );
 };

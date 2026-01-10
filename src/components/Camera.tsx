@@ -17,7 +17,7 @@ export const Camera: React.FC<CameraProps> = ({ videoRef, filter = 'none', isFla
     // For now, let's keep it simple.
 
     return (
-        <div className="relative w-full h-full overflow-hidden rounded-2xl shadow-2xl bg-black">
+        <div className="relative w-full h-full overflow-hidden rounded-[2px] shadow-2xl bg-black">
             {/* Video Feed */}
             <video
                 ref={videoRef}

@@ -9,7 +9,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useCamera } from '@/hooks/useCamera';
 import { generateCollage, AVAILABLE_TEMPLATES_1X4 } from '@/lib/collage';
 import { useOpenCV } from '@/hooks/useOpenCV';
-import { ModeToggle } from '@/components/ui/ThemeToggle';
+
 export default function Home() {
   const { loaded: cvLoaded } = useOpenCV();
   const { videoRef, startCamera } = useCamera();
@@ -257,10 +257,7 @@ export default function Home() {
         </div>
       </RetroWindow>
 
-      {/* Theme Toggle Button - Positioned absolutely outside the window */}
-      <div className="fixed top-4 right-4 z-50">
-        <ModeToggle />
-      </div>
+
 
       {/* Preview Modal */}
       <PreviewModal
